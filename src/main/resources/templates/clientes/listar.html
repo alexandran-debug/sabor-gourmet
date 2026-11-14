@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clientes | Sabor Gourmet</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}" />
+  </head>
+
+  <body class="pagina-clientes">
+    <nav class="navegacion-interior">
+      <a class="marca-interior" th:href="@{/}">SABOR GOURMET</a>
+      <a th:href="@{/}">Volver al inicio</a>
+    </nav>
+
+    <main class="clientes-contenido">
+      <header class="clientes-portada">
+        <div>
+          <p class="clientes-etiqueta">SABOR GOURMET · ADMINISTRACIÓN</p>
+          <h1>Gestión de clientes</h1>
+          <p class="clientes-descripcion">
+            Administra la información de las personas que disfrutan de nuestra
+            experiencia gastronómica.
+          </p>
+        </div>
+
+        <a class="clientes-boton-nuevo" th:href="@{/clientes/nuevo}">
+          <span>+</span> Registrar cliente
+        </a>
+      </header>
+
+      <p class="mensaje-exito" th:if="${mensaje}" th:text="${mensaje}"></p>
+
+      <section class="clientes-listado">
+        <div class="clientes-listado-titulo">
+          <div>
+            <p class="clientes-etiqueta">DIRECTORIO</p>
+            <h2>Clientes registrados</h2>
+          </div>
+
+          <span
+            class="clientes-total"
+            th:text="${#lists.size(clientes)} + ' clientes'"
+          >
+            0 clientes
+          </span>
+        </div>
+
+        <div class="clientes-vacios" th:if="${#lists.isEmpty(clientes)}">
+          <span>✦</span>
+          <h3>Aún no hay clientes registrados</h3>
+          <p>
+            Registra el primer cliente para comenzar a gestionar tus reservas.
+          </p>
+          <a th:href="@{/clientes/nuevo}">Registrar primer cliente</a>
+        </div>
+
+        <div class="clientes-grid" th:unless="${#lists.isEmpty(clientes)}">
+          <article class="cliente-card" th:each="cliente : ${clientes}">
+            <div class="cliente-card-cabecera">
+              <div
+                class="cliente-avatar"
+                th:text="${#strings.substring(cliente.nombre, 0, 1).toUpperCase()}"
+              >
+                C
+              </div>
+
+              <div class="cliente-identidad">
+                <h3 th:text="${cliente.nombre + ' ' + cliente.apellido}">
+                  Nombre del cliente
+                </h3>
+                <span>CLIENTE SABOR GOURMET</span>
+              </div>
+            </div>
+
+            <div class="cliente-datos">
+              <div>
+                <span>CORREO ELECTRÓNICO</span>
+                <strong th:text="${cliente.correo}"></strong>
+              </div>
+
+              <div>
+                <span>TELÉFONO</span>
+                <strong th:text="${cliente.telefono}"></strong>
+              </div>
+            </div>
+
+            <div class="cliente-acciones">
+              <a
+                class="cliente-editar"
+                th:href="@{/clientes/editar/{id}(id=${cliente.id})}"
+              >
+                Editar información
+              </a>
+
+              <form
+                th:action="@{/clientes/eliminar/{id}(id=${cliente.id})}"
+                method="post"
+                onsubmit="
+                  return confirm(
+                    '¿Estás seguro de que deseas eliminar este cliente?',
+                  );
+                "
+              >
+                <button class="cliente-eliminar" type="submit">Eliminar</button>
+              </form>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="pie-inicio">SABOR GOURMET · SISTEMA DE RESERVAS</footer>
+  </body>
+</html>

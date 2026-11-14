@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Administración | Sabor Gourmet</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}" />
+  </head>
+
+  <body class="pagina-admin">
+    <nav class="navegacion-interior">
+      <a class="marca-interior" th:href="@{/}">SABOR GOURMET</a>
+      <a th:href="@{/}">Volver al inicio</a>
+    </nav>
+
+    <main class="admin-contenido">
+      <header class="admin-portada">
+        <div>
+          <p class="admin-etiqueta">SABOR GOURMET · PANEL DE CONTROL</p>
+          <h1>Administración</h1>
+          <p>
+            Bienvenido al sistema de gestión de Sabor Gourmet. Desde aquí puedes
+            administrar los recursos del restaurante.
+          </p>
+        </div>
+
+        <div class="admin-decoracion">✦</div>
+      </header>
+
+      <section class="admin-resumen">
+        <div class="admin-seccion-titulo">
+          <div>
+            <p class="admin-etiqueta">ESTADO DEL RESTAURANTE</p>
+            <h2>Resumen general</h2>
+          </div>
+        </div>
+
+        <div class="admin-indicadores">
+          <article class="admin-indicador">
+            <span class="admin-indicador-icono">♧</span>
+            <div>
+              <p>Total de mesas</p>
+              <strong th:text="${totalMesas}">0</strong>
+              <span>Mesas registradas</span>
+            </div>
+          </article>
+
+          <article class="admin-indicador">
+            <span class="admin-indicador-icono">✦</span>
+            <div>
+              <p>Total de reservas</p>
+              <strong th:text="${totalReservas}">0</strong>
+              <span>Reservas registradas</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="admin-gestion">
+        <div class="admin-seccion-titulo">
+          <div>
+            <p class="admin-etiqueta">HERRAMIENTAS DEL SISTEMA</p>
+            <h2>Gestión del restaurante</h2>
+          </div>
+        </div>
+
+        <div class="admin-modulos">
+          <a class="admin-modulo" th:href="@{/admin/mesas}">
+            <span class="admin-modulo-icono">♧</span>
+            <div>
+              <h3>Gestión de mesas</h3>
+              <p>Registra mesas y administra su disponibilidad y capacidad.</p>
+            </div>
+            <span class="admin-modulo-flecha">→</span>
+          </a>
+
+          <a class="admin-modulo" th:href="@{/reservas}">
+            <span class="admin-modulo-icono">✦</span>
+            <div>
+              <h3>Gestión de reservas</h3>
+              <p>
+                Consulta, modifica y administra las reservas del restaurante.
+              </p>
+            </div>
+            <span class="admin-modulo-flecha">→</span>
+          </a>
+
+          <a class="admin-modulo" th:href="@{/clientes}">
+            <span class="admin-modulo-icono">♙</span>
+            <div>
+              <h3>Gestión de clientes</h3>
+              <p>
+                Consulta y actualiza la información de los clientes registrados.
+              </p>
+            </div>
+            <span class="admin-modulo-flecha">→</span>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="pie-inicio">SABOR GOURMET · SISTEMA DE RESERVAS</footer>
+  </body>
+</html>

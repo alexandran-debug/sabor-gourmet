@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sabor Gourmet | Restaurante</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}" />
+  </head>
+  <body class="pagina-inicio">
+    <nav class="navegacion">
+      <a class="marca" th:href="@{/}">SABOR GOURMET</a>
+
+      <div class="enlaces-nav">
+        <a th:href="@{/}">Inicio</a>
+        <a th:href="@{/reservas}">Reservas</a>
+        <a th:href="@{/clientes}">Clientes</a>
+        <a th:href="@{/admin}">Administración</a>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero">
+        <div class="contenido-hero">
+          <p class="etiqueta-hero">COCINA · EXPERIENCIA · SABOR</p>
+
+          <h1>Una experiencia<br />para recordar.</h1>
+
+          <p class="descripcion-hero">
+            Descubre el placer de compartir una buena mesa. Reserva tu próximo
+            momento especial con nosotros.
+          </p>
+
+          <a class="boton-reserva" th:href="@{/reservas/nueva}">
+            Reservar una mesa
+          </a>
+        </div>
+      </section>
+
+      <section class="bienvenida">
+        <p class="etiqueta-seccion">BIENVENIDOS A SABOR GOURMET</p>
+        <h2>El placer de disfrutar cada momento</h2>
+        <p>
+          Creamos un espacio donde la gastronomía y los buenos momentos se
+          encuentran. Te esperamos.
+        </p>
+      </section>
+    </main>
+
+    <footer class="pie-inicio">
+      <p>SABOR GOURMET · SISTEMA DE RESERVAS</p>
+    </footer>
+  </body>
+</html>

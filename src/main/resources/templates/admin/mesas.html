@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestión de mesas | Sabor Gourmet</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}" />
+  </head>
+
+  <body class="pagina-admin admin-mesas">
+    <nav class="navegacion-interior">
+      <a class="marca-interior" th:href="@{/}">SABOR GOURMET</a>
+      <a th:href="@{/admin}">Volver al panel</a>
+    </nav>
+
+    <main class="admin-mesas-contenido">
+      <header class="admin-mesas-portada">
+        <div>
+          <p class="admin-etiqueta">SABOR GOURMET · ADMINISTRACIÓN</p>
+          <h1>Gestión de mesas</h1>
+          <p>
+            Organiza los espacios del restaurante y administra la disponibilidad
+            de cada mesa.
+          </p>
+        </div>
+
+        <a class="admin-mesas-boton-nueva" th:href="@{/admin/mesas/nueva}">
+          <span>+</span> Registrar mesa
+        </a>
+      </header>
+
+      <p class="mensaje-exito" th:if="${mensaje}" th:text="${mensaje}"></p>
+      <p class="mensaje-error" th:if="${error}" th:text="${error}"></p>
+
+      <section class="admin-mesas-listado">
+        <div class="admin-mesas-listado-titulo">
+          <div>
+            <p class="admin-etiqueta">ESPACIOS DEL RESTAURANTE</p>
+            <h2>Mesas registradas</h2>
+          </div>
+
+          <span
+            class="admin-mesas-total"
+            th:text="${#lists.size(mesas)} + ' mesas'"
+          >
+            0 mesas
+          </span>
+        </div>
+
+        <div class="admin-mesas-vacias" th:if="${#lists.isEmpty(mesas)}">
+          <span>♧</span>
+          <h3>Aún no hay mesas registradas</h3>
+          <p>
+            Registra las mesas del restaurante para comenzar a administrarlas.
+          </p>
+          <a th:href="@{/admin/mesas/nueva}">Registrar primera mesa</a>
+        </div>
+
+        <div class="admin-mesas-grid" th:unless="${#lists.isEmpty(mesas)}">
+          <article class="admin-mesa-card" th:each="mesa : ${mesas}">
+            <div class="admin-mesa-cabecera">
+              <div>
+                <span class="admin-mesa-etiqueta">MESA</span>
+                <h3 th:text="${mesa.numero}">1</h3>
+              </div>
+
+              <span
+                class="admin-mesa-estado"
+                th:classappend="${mesa.estado.name() == 'DISPONIBLE'} ? ' mesa-disponible' : ' mesa-no-disponible'"
+                th:text="${mesa.estado.name() == 'DISPONIBLE'} ? 'Disponible' : 'No disponible'"
+              >
+                Disponible
+              </span>
+            </div>
+
+            <div class="admin-mesa-datos">
+              <div>
+                <span>CAPACIDAD</span>
+                <strong th:text="${mesa.capacidad} + ' personas'">
+                  4 personas
+                </strong>
+              </div>
+
+              <div>
+                <span>UBICACIÓN</span>
+                <strong th:text="${mesa.ubicacion}"> Terraza </strong>
+              </div>
+            </div>
+
+            <div class="admin-mesa-edicion">
+              <a
+                class="admin-mesa-editar"
+                th:href="@{/admin/mesas/editar/{id}(id=${mesa.id})}"
+              >
+                Editar mesa
+              </a>
+            </div>
+
+            <form
+              class="admin-mesa-estado-form"
+              th:action="@{/admin/mesas/estado/{id}(id=${mesa.id})}"
+              method="post"
+            >
+              <label th:for="${'estado-' + mesa.id}"
+                >Cambiar disponibilidad</label
+              >
+
+              <div class="admin-mesa-estado-controles">
+                <select name="estado" th:id="${'estado-' + mesa.id}">
+                  <option
+                    value="DISPONIBLE"
+                    th:selected="${mesa.estado.name() == 'DISPONIBLE'}"
+                  >
+                    Disponible
+                  </option>
+
+                  <option
+                    value="NO_DISPONIBLE"
+                    th:selected="${mesa.estado.name() == 'NO_DISPONIBLE'}"
+                  >
+                    No disponible
+                  </option>
+                </select>
+
+                <button type="submit">Actualizar</button>
+              </div>
+            </form>
+
+            <form
+              class="admin-mesa-eliminar-form"
+              th:action="@{/admin/mesas/eliminar/{id}(id=${mesa.id})}"
+              method="post"
+              onsubmit="
+                return confirm(
+                  '¿Estás seguro de que deseas eliminar esta mesa?',
+                );
+              "
+            >
+              <button type="submit">Eliminar mesa</button>
+            </form>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="pie-inicio">SABOR GOURMET · SISTEMA DE RESERVAS</footer>
+  </body>
+</html>

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reservas | Sabor Gourmet</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}" />
+  </head>
+
+  <body class="pagina-reservas">
+    <nav class="navegacion-interior">
+      <a class="marca-interior" th:href="@{/}">SABOR GOURMET</a>
+      <a th:href="@{/}">Volver al inicio</a>
+    </nav>
+
+    <main class="reservas-contenido">
+      <header class="reservas-portada">
+        <div>
+          <p class="reservas-etiqueta">
+            SABOR GOURMET · EXPERIENCIA GASTRONÓMICA
+          </p>
+          <h1>Nuestras reservas</h1>
+          <p class="reservas-descripcion">
+            Cada encuentro merece una buena mesa. Consulta y administra tus
+            reservas.
+          </p>
+        </div>
+
+        <a class="reservas-boton-nueva" th:href="@{/reservas/nueva}">
+          <span>+</span> Nueva reserva
+        </a>
+      </header>
+
+      <p class="mensaje-exito" th:if="${mensaje}" th:text="${mensaje}"></p>
+      <p class="mensaje-error" th:if="${error}" th:text="${error}"></p>
+
+      <section class="reservas-listado">
+        <div class="reservas-listado-titulo">
+          <div>
+            <p class="reservas-etiqueta">AGENDA DEL RESTAURANTE</p>
+            <h2>Reservas registradas</h2>
+          </div>
+
+          <span
+            class="reservas-total"
+            th:text="${#lists.size(reservas)} + ' reservas'"
+          >
+          </span>
+        </div>
+
+        <div class="reservas-vacias" th:if="${#lists.isEmpty(reservas)}">
+          <span class="reservas-icono-vacio">✦</span>
+          <h3>Aún no hay reservas</h3>
+          <p>Cuando registres una reserva, aparecerá aquí.</p>
+          <a th:href="@{/reservas/nueva}">Crear primera reserva</a>
+        </div>
+
+        <div class="reservas-grid" th:unless="${#lists.isEmpty(reservas)}">
+          <article class="reserva-card" th:each="reserva : ${reservas}">
+            <div class="reserva-card-superior">
+              <div>
+                <span class="reserva-numero">RESERVA</span>
+                <h3
+                  th:text="${reserva.cliente.nombre + ' ' + reserva.cliente.apellido}"
+                >
+                  Nombre del cliente
+                </h3>
+              </div>
+
+              <span
+                class="reserva-estado"
+                th:classappend="${reserva.estado.name() == 'CANCELADA'} ? ' reserva-cancelada' : (${reserva.estado.name() == 'CONFIRMADA'} ? ' reserva-confirmada' : ' reserva-pendiente')"
+                th:text="${reserva.estado}"
+              >
+              </span>
+            </div>
+
+            <div class="reserva-detalles">
+              <div class="reserva-dato">
+                <span>FECHA</span>
+                <strong th:text="${reserva.fecha}"></strong>
+              </div>
+
+              <div class="reserva-dato">
+                <span>HORA</span>
+                <strong th:text="${reserva.hora}"></strong>
+              </div>
+
+              <div class="reserva-dato">
+                <span>MESA</span>
+                <strong th:text="${reserva.mesa.numero}"></strong>
+              </div>
+
+              <div class="reserva-dato">
+                <span>PERSONAS</span>
+                <strong th:text="${reserva.cantidadPersonas}"></strong>
+              </div>
+            </div>
+
+            <div class="reserva-acciones">
+              <a
+                class="reserva-ver"
+                th:href="@{/reservas/detalle/{id}(id=${reserva.id})}"
+              >
+                Ver detalles
+              </a>
+
+              <a
+                class="reserva-editar"
+                th:if="${reserva.estado.name() != 'CANCELADA'}"
+                th:href="@{/reservas/editar/{id}(id=${reserva.id})}"
+              >
+                Editar
+              </a>
+
+              <form
+                th:if="${reserva.estado.name() != 'CANCELADA'}"
+                th:action="@{/reservas/cancelar/{id}(id=${reserva.id})}"
+                method="post"
+                onsubmit="return confirm('¿Deseas cancelar esta reserva?');"
+              >
+                <button class="reserva-cancelar" type="submit">Cancelar</button>
+              </form>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="pie-inicio">SABOR GOURMET · SISTEMA DE RESERVAS</footer>
+  </body>
+</html>

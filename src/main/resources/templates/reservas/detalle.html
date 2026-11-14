@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalle de reserva | Sabor Gourmet</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}" />
+  </head>
+
+  <body class="pagina-reservas detalle-reserva">
+    <nav class="navegacion-interior">
+      <a class="marca-interior" th:href="@{/}">SABOR GOURMET</a>
+      <a th:href="@{/reservas}">Volver a reservas</a>
+    </nav>
+
+    <main class="detalle-reserva-contenido">
+      <header class="detalle-reserva-portada">
+        <p class="reservas-etiqueta">
+          SABOR GOURMET · EXPERIENCIA GASTRONÓMICA
+        </p>
+        <h1>Detalle de reserva</h1>
+        <p>Consulta toda la información de esta reserva.</p>
+      </header>
+
+      <section class="detalle-reserva-panel">
+        <div class="detalle-reserva-cabecera">
+          <div>
+            <span class="detalle-reserva-etiqueta">RESERVA REGISTRADA</span>
+            <h2
+              th:text="${reserva.cliente.nombre + ' ' + reserva.cliente.apellido}"
+            >
+              Nombre del cliente
+            </h2>
+          </div>
+
+          <span
+            class="reserva-estado"
+            th:classappend="${reserva.estado.name() == 'CANCELADA'} ? ' reserva-cancelada' : (${reserva.estado.name() == 'CONFIRMADA'} ? ' reserva-confirmada' : ' reserva-pendiente')"
+            th:text="${reserva.estado}"
+          >
+          </span>
+        </div>
+
+        <div class="detalle-reserva-seccion">
+          <h3>Información del cliente</h3>
+
+          <div class="detalle-reserva-grid">
+            <div class="detalle-reserva-dato">
+              <span>CLIENTE</span>
+              <strong
+                th:text="${reserva.cliente.nombre + ' ' + reserva.cliente.apellido}"
+              ></strong>
+            </div>
+
+            <div class="detalle-reserva-dato">
+              <span>CORREO ELECTRÓNICO</span>
+              <strong th:text="${reserva.cliente.correo}"></strong>
+            </div>
+
+            <div class="detalle-reserva-dato">
+              <span>TELÉFONO</span>
+              <strong th:text="${reserva.cliente.telefono}"></strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="detalle-reserva-seccion">
+          <h3>Información de la reserva</h3>
+
+          <div class="detalle-reserva-grid">
+            <div class="detalle-reserva-dato">
+              <span>MESA</span>
+              <strong th:text="${'Mesa ' + reserva.mesa.numero}"></strong>
+            </div>
+
+            <div class="detalle-reserva-dato">
+              <span>FECHA</span>
+              <strong th:text="${reserva.fecha}"></strong>
+            </div>
+
+            <div class="detalle-reserva-dato">
+              <span>HORA</span>
+              <strong th:text="${reserva.hora}"></strong>
+            </div>
+
+            <div class="detalle-reserva-dato">
+              <span>CANTIDAD DE PERSONAS</span>
+              <strong th:text="${reserva.cantidadPersonas}"></strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="detalle-reserva-seccion detalle-reserva-observaciones">
+          <h3>Observaciones</h3>
+
+          <p
+            th:if="${reserva.observaciones != null and !#strings.isEmpty(reserva.observaciones)}"
+            th:text="${reserva.observaciones}"
+          ></p>
+
+          <p
+            class="sin-observaciones"
+            th:if="${reserva.observaciones == null or #strings.isEmpty(reserva.observaciones)}"
+          >
+            No se registraron observaciones para esta reserva.
+          </p>
+        </div>
+
+        <div class="detalle-reserva-acciones">
+          <a class="reserva-boton-volver" th:href="@{/reservas}">
+            Volver al listado
+          </a>
+
+          <a
+            class="reserva-boton-guardar"
+            th:if="${reserva.estado.name() != 'CANCELADA'}"
+            th:href="@{/reservas/editar/{id}(id=${reserva.id})}"
+          >
+            Modificar reserva
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="pie-inicio">SABOR GOURMET · SISTEMA DE RESERVAS</footer>
+  </body>
+</html>

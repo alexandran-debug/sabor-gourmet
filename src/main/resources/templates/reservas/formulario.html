@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Formulario de reservas | Sabor Gourmet</title>
+    <link rel="stylesheet" th:href="@{/css/estilos.css}" />
+  </head>
+
+  <body class="pagina-reservas formulario-reserva">
+    <nav class="navegacion-interior">
+      <a class="marca-interior" th:href="@{/}">SABOR GOURMET</a>
+      <a th:href="@{/reservas}">Volver a reservas</a>
+    </nav>
+
+    <main class="formulario-reserva-contenido">
+      <header class="formulario-reserva-portada">
+        <p class="reservas-etiqueta">
+          SABOR GOURMET · EXPERIENCIA GASTRONÓMICA
+        </p>
+
+        <h1
+          th:text="${reserva.id == null ? 'Reserva tu mesa' : 'Modificar reserva'}"
+        >
+          Reserva tu mesa
+        </h1>
+
+        <p>
+          Completa los datos para organizar tu próxima experiencia gastronómica
+          con nosotros.
+        </p>
+      </header>
+
+      <section class="formulario-reserva-panel">
+        <div class="formulario-reserva-titulo">
+          <span>✦</span>
+          <div>
+            <h2>Detalles de la reserva</h2>
+            <p>Ingresa la información solicitada</p>
+          </div>
+        </div>
+
+        <p class="mensaje-error" th:if="${error}" th:text="${error}"></p>
+
+        <form
+          class="formulario-reserva-campos"
+          th:object="${reserva}"
+          th:action="${reserva.id == null} ? @{/reservas/guardar} : @{/reservas/actualizar/{id}(id=${reserva.id})}"
+          method="post"
+        >
+          <div class="campo-reserva">
+            <label for="clienteId">Cliente</label>
+            <select id="clienteId" name="clienteId" required>
+              <option value="">Seleccione un cliente</option>
+              <option
+                th:each="cliente : ${clientes}"
+                th:value="${cliente.id}"
+                th:text="${cliente.nombre + ' ' + cliente.apellido}"
+                th:selected="${reserva.cliente != null and reserva.cliente.id == cliente.id}"
+              ></option>
+            </select>
+          </div>
+
+          <div class="campo-reserva">
+            <label for="mesaId">Mesa</label>
+            <select id="mesaId" name="mesaId" required>
+              <option value="">Seleccione una mesa</option>
+              <option
+                th:each="mesa : ${mesas}"
+                th:value="${mesa.id}"
+                th:text="${'Mesa ' + mesa.numero + ' - Capacidad: ' + mesa.capacidad}"
+                th:selected="${reserva.mesa != null and reserva.mesa.id == mesa.id}"
+              ></option>
+            </select>
+          </div>
+
+          <div class="campo-reserva">
+            <label for="fecha">Fecha</label>
+            <input type="date" id="fecha" th:field="*{fecha}" required />
+            <p class="error-campo" th:errors="*{fecha}"></p>
+          </div>
+
+          <div class="campo-reserva">
+            <label for="hora">Hora</label>
+            <input type="time" id="hora" th:field="*{hora}" required />
+            <p class="error-campo" th:errors="*{hora}"></p>
+          </div>
+
+          <div class="campo-reserva">
+            <label for="cantidadPersonas">Cantidad de personas</label>
+            <input
+              type="number"
+              id="cantidadPersonas"
+              th:field="*{cantidadPersonas}"
+              min="1"
+              required
+            />
+            <p class="error-campo" th:errors="*{cantidadPersonas}"></p>
+          </div>
+
+          <div class="campo-reserva campo-reserva-completo">
+            <label for="observaciones">Observaciones</label>
+            <textarea
+              id="observaciones"
+              th:field="*{observaciones}"
+              maxlength="300"
+              rows="4"
+              placeholder="¿Alguna solicitud especial? (Opcional)"
+            >
+            </textarea>
+          </div>
+
+          <div class="formulario-reserva-acciones">
+            <a th:href="@{/reservas}" class="reserva-boton-volver">
+              Cancelar
+            </a>
+
+            <button type="submit" class="reserva-boton-guardar">
+              Guardar reserva
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <footer class="pie-inicio">SABOR GOURMET · SISTEMA DE RESERVAS</footer>
+  </body>
+</html>
