@@ -12,7 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-// Controla las operaciones de las reservas.
+// Controla las acciones relacionadas con las reservas del restaurante.
 @Controller
 @RequestMapping("/reservas")
 public class ReservaController {
@@ -21,6 +21,7 @@ public class ReservaController {
     private final ClienteService clienteService;
     private final MesaService mesaService;
 
+    // Recibe los servicios necesarios para gestionar las reservas.
     public ReservaController(
             ReservaService reservaService,
             ClienteService clienteService,
@@ -30,14 +31,14 @@ public class ReservaController {
         this.mesaService = mesaService;
     }
 
-    // Muestra las reservas registradas.
+    // Muestra el listado de las reservas registradas.
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("reservas", reservaService.listarReservas());
         return "reservas/listar";
     }
 
-    // Muestra el formulario para crear una reserva.
+    // Prepara el formulario y carga los clientes y mesas disponibles.
     @GetMapping("/nueva")
     public String nueva(Model model) {
         model.addAttribute("reserva", new Reserva());
@@ -45,7 +46,7 @@ public class ReservaController {
         return "reservas/formulario";
     }
 
-    // Registra una nueva reserva.
+    // Valida los datos ingresados y solicita registrar la reserva.
     @PostMapping("/guardar")
     public String guardar(
             @Valid @ModelAttribute("reserva") Reserva reserva,
@@ -55,6 +56,7 @@ public class ReservaController {
             RedirectAttributes redirectAttributes,
             Model model) {
 
+        // Si hay errores, vuelve al formulario para corregirlos.
         if (resultado.hasErrors()) {
             cargarDatosFormulario(model);
             return "reservas/formulario";
@@ -67,13 +69,14 @@ public class ReservaController {
             return "redirect:/reservas";
 
         } catch (IllegalArgumentException e) {
+            // Muestra el motivo por el que no se pudo registrar la reserva.
             model.addAttribute("error", e.getMessage());
             cargarDatosFormulario(model);
             return "reservas/formulario";
         }
     }
 
-    // Muestra los datos de una reserva.
+    // Busca una reserva y muestra toda su información.
     @GetMapping("/detalle/{id}")
     public String detalle(@PathVariable Long id, Model model) {
         Reserva reserva = reservaService.buscarPorId(id)
@@ -84,7 +87,7 @@ public class ReservaController {
         return "reservas/detalle";
     }
 
-    // Muestra el formulario para modificar una reserva.
+    // Carga los datos de una reserva existente para poder editarla.
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Long id, Model model) {
         Reserva reserva = reservaService.buscarPorId(id)
@@ -96,7 +99,7 @@ public class ReservaController {
         return "reservas/formulario";
     }
 
-    // Actualiza una reserva existente.
+    // Valida los cambios y solicita actualizar la reserva.
     @PostMapping("/actualizar/{id}")
     public String actualizar(
             @PathVariable Long id,
@@ -107,6 +110,7 @@ public class ReservaController {
             RedirectAttributes redirectAttributes,
             Model model) {
 
+        // Si los datos no cumplen las validaciones, mantiene abierto el formulario.
         if (resultado.hasErrors()) {
             cargarDatosFormulario(model);
             return "reservas/formulario";
@@ -125,7 +129,7 @@ public class ReservaController {
         }
     }
 
-    // Cancela una reserva sin eliminar su registro.
+    // Cancela la reserva sin eliminar su registro de la base de datos.
     @PostMapping("/cancelar/{id}")
     public String cancelar(
             @PathVariable Long id,
@@ -142,7 +146,7 @@ public class ReservaController {
         return "redirect:/reservas";
     }
 
-    // Carga clientes y mesas para los formularios.
+    // Carga los clientes registrados y las mesas que están disponibles.
     private void cargarDatosFormulario(Model model) {
         model.addAttribute("clientes", clienteService.listarClientes());
         model.addAttribute(

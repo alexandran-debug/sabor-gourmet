@@ -7,17 +7,17 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.util.List;
 
-// Gestiona las operaciones de base de datos de las reservas.
+// Permite consultar y administrar las reservas mediante Spring Data JPA.
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
-    // Busca todas las reservas de una fecha.
+    // Obtiene todas las reservas correspondientes a una fecha.
     List<Reserva> findByFecha(LocalDate fecha);
 
-    // Busca las reservas realizadas por un cliente.
+    // Busca las reservas asociadas a un cliente específico.
     List<Reserva> findByClienteId(Long clienteId);
 
-    // Busca las reservas de una fecha que no tengan un estado determinado.
+    // Obtiene las reservas de una fecha, excluyendo el estado indicado.
     List<Reserva> findByFechaAndEstadoNot(
             LocalDate fecha,
             Reserva.EstadoReserva estado

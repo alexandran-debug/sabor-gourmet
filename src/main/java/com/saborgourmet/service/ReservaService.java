@@ -1,4 +1,3 @@
-
 package com.saborgourmet.service;
 
 import com.saborgourmet.model.Cliente;
@@ -16,18 +15,19 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
-// Contiene la lógica de negocio relacionada con las reservas.
+// Aquí se encuentran las reglas y operaciones para gestionar las reservas.
 @Service
 @Transactional
 public class ReservaService {
 
-    // Duración establecida para cada reserva.
+    // Cada reserva ocupa la mesa durante dos horas.
     private static final int DURACION_RESERVA_HORAS = 2;
 
     private final ReservaRepository reservaRepository;
     private final ClienteRepository clienteRepository;
     private final MesaRepository mesaRepository;
 
+    // Recibe los repositorios que permiten consultar y guardar la información.
     public ReservaService(
             ReservaRepository reservaRepository,
             ClienteRepository clienteRepository,
@@ -37,46 +37,49 @@ public class ReservaService {
         this.mesaRepository = mesaRepository;
     }
 
-    // Obtiene todas las reservas registradas.
+    // Obtiene todas las reservas para mostrarlas en el sistema.
     @Transactional(readOnly = true)
     public List<Reserva> listarReservas() {
         return reservaRepository.findAll();
     }
 
-    // Busca una reserva por su identificador.
+    // Busca una reserva específica a partir de su ID.
     @Transactional(readOnly = true)
     public Optional<Reserva> buscarPorId(Long id) {
         return reservaRepository.findById(id);
     }
 
-    // Busca las reservas de un cliente.
+    // Obtiene las reservas asociadas a un cliente.
     @Transactional(readOnly = true)
     public List<Reserva> listarPorCliente(Long clienteId) {
         return reservaRepository.findByClienteId(clienteId);
     }
 
-    // Busca las reservas correspondientes a una fecha.
+    // Filtra las reservas según la fecha seleccionada.
     @Transactional(readOnly = true)
     public List<Reserva> listarPorFecha(LocalDate fecha) {
         return reservaRepository.findByFecha(fecha);
     }
 
-    // Registra una nueva reserva.
+    // Crea una reserva relacionándola con el cliente y la mesa seleccionados.
     public Reserva crearReserva(
             Reserva reserva,
             Long clienteId,
             Long mesaId) {
 
+        // Comprueba que el cliente exista antes de continuar.
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "No se encontró el cliente solicitado."
                 ));
 
+        // Comprueba que la mesa seleccionada esté registrada.
         Mesa mesa = mesaRepository.findById(mesaId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "No se encontró la mesa solicitada."
                 ));
 
+        // Revisa que la fecha, la hora y la mesa cumplan las reglas del sistema.
         validarReserva(reserva, mesa, null);
 
         reserva.setCliente(cliente);
@@ -86,7 +89,7 @@ public class ReservaService {
         return reservaRepository.save(reserva);
     }
 
-    // Modifica una reserva existente.
+    // Actualiza los datos de una reserva que ya existe.
     public Reserva actualizarReserva(
             Long id,
             Reserva datosActualizados,
@@ -98,6 +101,7 @@ public class ReservaService {
                         "No se encontró la reserva solicitada."
                 ));
 
+        // Una reserva cancelada no puede volver a modificarse.
         if (reserva.getEstado() == Reserva.EstadoReserva.CANCELADA) {
             throw new IllegalArgumentException(
                     "No se puede modificar una reserva cancelada."
@@ -114,6 +118,7 @@ public class ReservaService {
                         "No se encontró la mesa solicitada."
                 ));
 
+        // Valida los nuevos datos antes de guardar los cambios.
         validarReserva(datosActualizados, mesa, id);
 
         reserva.setFecha(datosActualizados.getFecha());
@@ -126,7 +131,7 @@ public class ReservaService {
         return reservaRepository.save(reserva);
     }
 
-    // Comprueba que la reserva cumpla las reglas del restaurante.
+    // Revisa que la reserva cumpla las condiciones antes de guardarla.
     private void validarReserva(
             Reserva reserva,
             Mesa mesa,
@@ -152,6 +157,7 @@ public class ReservaService {
             );
         }
 
+        // No permite reservar mesas que estén marcadas como no disponibles.
         if (mesa.getEstado() != Mesa.EstadoMesa.DISPONIBLE) {
             throw new IllegalArgumentException(
                     "La mesa seleccionada no está disponible."
@@ -165,20 +171,21 @@ public class ReservaService {
             );
         }
 
+        // Comprueba que la mesa tenga espacio para todas las personas.
         if (reserva.getCantidadPersonas() > mesa.getCapacidad()) {
             throw new IllegalArgumentException(
                     "La capacidad de la mesa es insuficiente."
             );
         }
 
-        // Calcula el horario de inicio y término de la reserva.
+        // Calcula cuánto tiempo estará ocupada la mesa.
         LocalDateTime inicioNuevo = LocalDateTime.of(
                 reserva.getFecha(), reserva.getHora());
 
         LocalDateTime finNuevo = inicioNuevo.plusHours(
                 DURACION_RESERVA_HORAS);
 
-        // Revisa las reservas existentes para detectar cruces de horario.
+        // Busca las reservas de esa fecha, dejando fuera las que fueron canceladas.
         List<Reserva> reservasExistentes =
                 reservaRepository.findByFechaAndEstadoNot(
                         reserva.getFecha(),
@@ -186,13 +193,13 @@ public class ReservaService {
 
         for (Reserva existente : reservasExistentes) {
 
-            // Ignora la misma reserva cuando se está modificando.
+            // Al editar, no compara la reserva consigo misma.
             if (reservaExcluidaId != null
                     && existente.getId().equals(reservaExcluidaId)) {
                 continue;
             }
 
-            // Solo comprueba las reservas de la misma mesa.
+            // Las reservas de otras mesas no afectan este horario.
             if (!existente.getMesa().getId().equals(mesa.getId())) {
                 continue;
             }
@@ -203,7 +210,7 @@ public class ReservaService {
             LocalDateTime finExistente = inicioExistente.plusHours(
                     DURACION_RESERVA_HORAS);
 
-            // Detecta si los horarios de las reservas se cruzan.
+            // Comprueba si el nuevo horario coincide con una reserva existente.
             boolean existeCruce = inicioNuevo.isBefore(finExistente)
                     && finNuevo.isAfter(inicioExistente);
 
@@ -215,7 +222,7 @@ public class ReservaService {
         }
     }
 
-    // Cancela una reserva sin eliminar su registro.
+    // Cambia el estado de la reserva a cancelada, sin borrar sus datos.
     public Reserva cancelarReserva(Long id) {
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(

@@ -1,4 +1,3 @@
-
 package com.saborgourmet.model;
 
 import jakarta.persistence.*;
@@ -10,43 +9,43 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "mesas")
 public class Mesa {
 
-    // Identificador único de la mesa.
+    // Identificador único que se genera automáticamente.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Número identificador de la mesa.
+    // Número de mesa, obligatorio y sin valores menores que 1.
     @NotNull(message = "El número de mesa es obligatorio")
     @Min(value = 1, message = "El número debe ser mayor que cero")
     @Column(nullable = false, unique = true)
     private Integer numero;
 
-    // Cantidad máxima de personas que admite la mesa.
+    // Cantidad máxima de personas que puede recibir la mesa.
     @NotNull(message = "La capacidad es obligatoria")
     @Min(value = 1, message = "La capacidad debe ser al menos 1")
     @Column(nullable = false)
     private Integer capacidad;
 
-    // Ubicación de la mesa dentro del restaurante.
+    // Lugar donde se encuentra la mesa dentro del restaurante.
     @Column(length = 80)
     private String ubicacion;
 
-    // Estado actual de la mesa.
+    // Indica si la mesa está disponible para recibir reservas.
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EstadoMesa estado = EstadoMesa.DISPONIBLE;
 
-    // Constructor vacío requerido por JPA.
+    // Constructor vacío necesario para JPA.
     public Mesa() {
     }
 
-    // Estados permitidos para una mesa.
+    // Estos son los dos estados que puede tener una mesa.
     public enum EstadoMesa {
         DISPONIBLE,
         NO_DISPONIBLE
     }
 
-    // Getters y setters.
+    // Getters y setters para consultar y modificar los datos de la mesa.
 
     public Long getId() {
         return id;

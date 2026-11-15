@@ -18,6 +18,7 @@ public class AdminController {
     private final MesaService mesaService;
     private final ReservaService reservaService;
 
+    // Recibe los servicios necesarios para administrar mesas y consultar reservas.
     public AdminController(
             MesaService mesaService,
             ReservaService reservaService) {
@@ -25,7 +26,7 @@ public class AdminController {
         this.reservaService = reservaService;
     }
 
-    // Muestra el panel principal de administración.
+    // Muestra el panel principal con el resumen de mesas y reservas.
     @GetMapping
     public String inicio(Model model) {
         model.addAttribute("totalMesas", mesaService.listarMesas().size());
@@ -35,21 +36,21 @@ public class AdminController {
         return "admin/inicio";
     }
 
-    // Muestra todas las mesas registradas.
+    // Muestra todas las mesas para que el administrador pueda gestionarlas.
     @GetMapping("/mesas")
     public String listarMesas(Model model) {
         model.addAttribute("mesas", mesaService.listarMesas());
         return "admin/mesas";
     }
 
-    // Muestra el formulario para registrar una mesa.
+    // Abre el formulario para ingresar una mesa nueva.
     @GetMapping("/mesas/nueva")
     public String nuevaMesa(Model model) {
         model.addAttribute("mesa", new Mesa());
         return "admin/formulario-mesa";
     }
 
-    // Guarda una mesa nueva.
+    // Valida los datos y registra la mesa.
     @PostMapping("/mesas/guardar")
     public String guardarMesa(
             @Valid @ModelAttribute("mesa") Mesa mesa,
@@ -57,6 +58,7 @@ public class AdminController {
             RedirectAttributes redirectAttributes,
             Model model) {
 
+        // Si hay errores de validación, vuelve al formulario.
         if (resultado.hasErrors()) {
             return "admin/formulario-mesa";
         }
@@ -68,12 +70,13 @@ public class AdminController {
             return "redirect:/admin/mesas";
 
         } catch (IllegalArgumentException e) {
+            // Muestra el motivo por el que no se pudo guardar la mesa.
             model.addAttribute("error", e.getMessage());
             return "admin/formulario-mesa";
         }
     }
 
-    // Muestra el formulario para editar una mesa.
+    // Busca la mesa seleccionada y carga sus datos para editarlos.
     @GetMapping("/mesas/editar/{id}")
     public String editarMesa(@PathVariable Long id, Model model) {
         Mesa mesa = mesaService.buscarPorId(id)
@@ -84,7 +87,7 @@ public class AdminController {
         return "admin/formulario-mesa";
     }
 
-    // Actualiza una mesa existente.
+    // Comprueba los datos ingresados y guarda los cambios de la mesa.
     @PostMapping("/mesas/actualizar/{id}")
     public String actualizarMesa(
             @PathVariable Long id,
@@ -109,7 +112,7 @@ public class AdminController {
         }
     }
 
-    // Cambia el estado de disponibilidad de una mesa.
+    // Permite cambiar una mesa entre disponible y no disponible.
     @PostMapping("/mesas/estado/{id}")
     public String cambiarEstado(
             @PathVariable Long id,
@@ -127,7 +130,7 @@ public class AdminController {
         return "redirect:/admin/mesas";
     }
 
-    // Elimina una mesa.
+    // Elimina una mesa, siempre que no exista un problema con sus reservas asociadas.
     @PostMapping("/mesas/eliminar/{id}")
     public String eliminarMesa(
             @PathVariable Long id,

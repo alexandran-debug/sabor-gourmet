@@ -1,4 +1,3 @@
-
 package com.saborgourmet.repository;
 
 import com.saborgourmet.model.Mesa;
@@ -7,13 +6,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-// Gestiona las operaciones de base de datos de las mesas.
+// Permite consultar y administrar las mesas mediante Spring Data JPA.
 @Repository
 public interface MesaRepository extends JpaRepository<Mesa, Long> {
 
-    // Busca las mesas según su estado.
+    // Obtiene las mesas que tienen el estado indicado.
     List<Mesa> findByEstado(Mesa.EstadoMesa estado);
 
-    // Comprueba si ya existe una mesa con ese número.
+    // Comprueba si el número de mesa ya está registrado.
     boolean existsByNumero(Integer numero);
 }

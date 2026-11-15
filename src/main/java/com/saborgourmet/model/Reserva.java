@@ -1,4 +1,3 @@
-
 package com.saborgourmet.model;
 
 import jakarta.persistence.*;
@@ -15,60 +14,60 @@ import java.time.LocalTime;
 @Table(name = "reservas")
 public class Reserva {
 
-    // Identificador único de la reserva.
+    // Identificador único que se genera automáticamente.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Fecha en que se realizará la reserva.
+    // Fecha en que se realizará la reserva, sin permitir fechas anteriores a hoy.
     @NotNull(message = "La fecha es obligatoria")
     @FutureOrPresent(message = "La fecha no puede ser anterior a hoy")
     @Column(nullable = false)
     private LocalDate fecha;
 
-    // Hora de la reserva.
+    // Hora seleccionada para la reserva.
     @NotNull(message = "La hora es obligatoria")
     @Column(nullable = false)
     private LocalTime hora;
 
-    // Cantidad de personas que asistirán.
+    // Número de personas que asistirán a la reserva.
     @NotNull(message = "La cantidad de personas es obligatoria")
     @Min(value = 1, message = "Debe asistir al menos una persona")
     @Column(nullable = false)
     private Integer cantidadPersonas;
 
-    // Estado actual de la reserva.
+    // Indica en qué estado se encuentra la reserva.
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private EstadoReserva estado = EstadoReserva.PENDIENTE;
 
-    // Observaciones adicionales de la reserva.
+    // Permite agregar información adicional, con un máximo de 300 caracteres.
     @Size(max = 300, message = "Las observaciones no pueden superar los 300 caracteres")
     @Column(length = 300)
     private String observaciones;
 
-    // Relación: muchas reservas pueden pertenecer a un cliente.
+    // Relaciona cada reserva con el cliente que la realizó.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
-    // Relación: una mesa puede tener varias reservas en distintos horarios.
+    // Relaciona la reserva con la mesa asignada.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mesa_id", nullable = false)
     private Mesa mesa;
 
-    // Constructor vacío requerido por JPA.
+    // Constructor vacío necesario para JPA.
     public Reserva() {
     }
 
-    // Estados permitidos para una reserva.
+    // Estados que puede tener una reserva durante su gestión.
     public enum EstadoReserva {
         PENDIENTE,
         CONFIRMADA,
         CANCELADA
     }
 
-    // Getters y setters.
+    // Getters y setters para consultar y modificar los datos de la reserva.
 
     public Long getId() {
         return id;

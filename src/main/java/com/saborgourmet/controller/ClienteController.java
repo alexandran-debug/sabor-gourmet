@@ -9,32 +9,33 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-// Controla las operaciones de los clientes.
+// Controla las acciones relacionadas con el registro y administración de clientes.
 @Controller
 @RequestMapping("/clientes")
 public class ClienteController {
 
     private final ClienteService clienteService;
 
+    // Recibe el servicio que se encarga de trabajar con los datos de los clientes.
     public ClienteController(ClienteService clienteService) {
         this.clienteService = clienteService;
     }
 
-    // Muestra el listado de clientes.
+    // Muestra el listado de todos los clientes registrados.
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("clientes", clienteService.listarClientes());
         return "clientes/listar";
     }
 
-    // Muestra el formulario para registrar un cliente.
+    // Abre el formulario con un cliente vacío para registrar uno nuevo.
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
         model.addAttribute("cliente", new Cliente());
         return "clientes/formulario";
     }
 
-    // Guarda un cliente nuevo.
+    // Valida los datos y guarda el nuevo cliente si no existe otro con el mismo correo.
     @PostMapping("/guardar")
     public String guardar(
             @Valid @ModelAttribute("cliente") Cliente cliente,
@@ -42,10 +43,12 @@ public class ClienteController {
             RedirectAttributes redirectAttributes,
             Model model) {
 
+        // Si hay datos incorrectos, vuelve al formulario para corregirlos.
         if (resultado.hasErrors()) {
             return "clientes/formulario";
         }
 
+        // Evita registrar dos clientes con la misma dirección de correo.
         if (clienteService.buscarPorCorreo(cliente.getCorreo()).isPresent()) {
             model.addAttribute("error", "Ya existe un cliente con ese correo.");
             return "clientes/formulario";
@@ -58,7 +61,7 @@ public class ClienteController {
         return "redirect:/clientes";
     }
 
-    // Muestra el formulario para editar un cliente.
+    // Busca al cliente seleccionado y carga sus datos en el formulario de edición.
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Long id, Model model) {
         Cliente cliente = clienteService.buscarPorId(id)
@@ -69,7 +72,7 @@ public class ClienteController {
         return "clientes/formulario";
     }
 
-    // Actualiza los datos de un cliente.
+    // Actualiza los datos del cliente después de validar la información ingresada.
     @PostMapping("/actualizar/{id}")
     public String actualizar(
             @PathVariable Long id,
@@ -78,10 +81,12 @@ public class ClienteController {
             RedirectAttributes redirectAttributes,
             Model model) {
 
+        // Si algún dato no cumple las validaciones, mantiene abierto el formulario.
         if (resultado.hasErrors()) {
             return "clientes/formulario";
         }
 
+        // Comprueba que el correo no esté registrado por otro cliente.
         if (clienteService.buscarPorCorreo(cliente.getCorreo())
                 .filter(existente -> !existente.getId().equals(id)).isPresent()) {
             model.addAttribute("error", "Ese correo ya pertenece a otro cliente.");
@@ -95,7 +100,7 @@ public class ClienteController {
         return "redirect:/clientes";
     }
 
-    // Elimina un cliente.
+    // Elimina al cliente seleccionado y vuelve al listado.
     @PostMapping("/eliminar/{id}")
     public String eliminar(
             @PathVariable Long id,

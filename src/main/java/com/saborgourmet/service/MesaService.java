@@ -1,4 +1,3 @@
-
 package com.saborgourmet.service;
 
 import com.saborgourmet.model.Mesa;
@@ -9,36 +8,37 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-// Contiene la lógica de negocio relacionada con las mesas.
+// Se encarga de administrar las mesas y controlar sus datos.
 @Service
 @Transactional
 public class MesaService {
 
     private final MesaRepository mesaRepository;
 
+    // Recibe el repositorio que permite consultar y guardar las mesas.
     public MesaService(MesaRepository mesaRepository) {
         this.mesaRepository = mesaRepository;
     }
 
-    // Obtiene todas las mesas registradas.
+    // Obtiene todas las mesas registradas en el restaurante.
     @Transactional(readOnly = true)
     public List<Mesa> listarMesas() {
         return mesaRepository.findAll();
     }
 
-    // Busca una mesa por su identificador.
+    // Busca una mesa a partir de su identificador.
     @Transactional(readOnly = true)
     public Optional<Mesa> buscarPorId(Long id) {
         return mesaRepository.findById(id);
     }
 
-    // Obtiene las mesas según su disponibilidad.
+    // Muestra solamente las mesas que tienen el estado indicado.
     @Transactional(readOnly = true)
     public List<Mesa> listarPorEstado(Mesa.EstadoMesa estado) {
         return mesaRepository.findByEstado(estado);
     }
 
-    // Registra una mesa nueva.
+    // Antes de guardar, comprueba que el número de mesa no esté repetido.
     public Mesa guardarMesa(Mesa mesa) {
         if (mesaRepository.existsByNumero(mesa.getNumero())) {
             throw new IllegalArgumentException(
@@ -49,14 +49,14 @@ public class MesaService {
         return mesaRepository.save(mesa);
     }
 
-    // Actualiza los datos de una mesa existente.
+    // Busca la mesa y actualiza sus datos con la información recibida.
     public Mesa actualizarMesa(Long id, Mesa datosActualizados) {
         Mesa mesa = mesaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "No se encontró la mesa solicitada."
                 ));
 
-        // Comprueba que el número no esté asignado a otra mesa.
+        // Evita asignar a esta mesa un número que ya utiliza otra.
         if (!mesa.getNumero().equals(datosActualizados.getNumero())
                 && mesaRepository.existsByNumero(datosActualizados.getNumero())) {
             throw new IllegalArgumentException(
@@ -72,7 +72,7 @@ public class MesaService {
         return mesaRepository.save(mesa);
     }
 
-    // Cambia la disponibilidad de una mesa.
+    // Permite cambiar el estado de una mesa, por ejemplo, su disponibilidad.
     public Mesa cambiarEstado(Long id, Mesa.EstadoMesa nuevoEstado) {
         Mesa mesa = mesaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(
@@ -84,7 +84,7 @@ public class MesaService {
         return mesaRepository.save(mesa);
     }
 
-    // Elimina una mesa por su identificador.
+    // Verifica que la mesa exista antes de eliminarla.
     public void eliminarMesa(Long id) {
         if (!mesaRepository.existsById(id)) {
             throw new IllegalArgumentException(
